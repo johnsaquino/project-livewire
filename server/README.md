@@ -69,8 +69,8 @@ This section guides you through setting up the server component for both local d
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/heiko-hotz/project-pastra-v2.git
-   cd project-pastra-v2/server
+   git clone https://github.com/heiko-hotz/project-pastra.git
+   cd project-pastra/server
    ```
 
 2. **Create a virtual environment (recommended):**

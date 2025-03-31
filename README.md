@@ -1,227 +1,137 @@
-# Project Pastra
+# Project Pastra 🍝
 
-![Project Pastra](assets/project_pastra.png)
+![Project Pastra Banner](assets/project_pastra.png)
 
-## Overview
+**Talk to AI like never before! Project Pastra is a real-time, multimodal chat application showcasing the power of Google's Gemini 2.0 Flash (experimental) Live API.**
 
-Project Pastra is a modern multimodal chat application showcasing real-time voice, text, and visual interactions using Google's Gemini 2.0 Flash (experimental) and its Live API capabilities.  It offers a responsive web interface designed for both development and mobile use cases.
+Think "Star Trek computer" interaction – speak naturally, show your webcam, share your screen, and get instant, streamed audio responses. Pastra brings this futuristic experience to your browser today.
 
-This project extends the concepts from the [Gemini Multimodal Live API Developer Guide](https://github.com/heiko-hotz/gemini-multimodal-live-dev-guide), providing production-ready features and enhanced capabilities.
+This project builds upon the concepts from the [Gemini Multimodal Live API Developer Guide](https://github.com/heiko-hotz/gemini-multimodal-live-dev-guide) with a focus on a more production-ready setup and enhanced features.
 
-### Key Features
+## ✨ Key Features
 
-- 🎤 Real-time voice interaction with AI.
-- 💬 Text-based chat functionality.
-- 📷 Webcam integration for visual context.
-- 🖥️ Screen sharing capabilities.
-- 🔊 High-quality audio streaming.
-- 🛠️ Integrated tools for:
-  - Weather information
-  - Calendar management
+*   **🎤 Real-time Voice:** Natural, low-latency voice conversations.
+*   **👁️ Multimodal Input:** Combines voice, text, webcam video, and screen sharing.
+*   **🔊 Streamed Audio Output:** Hear responses instantly as they are generated.
+*   **↩️ Interruptible:** Talk over the AI, just like a real conversation.
+*   **🛠️ Integrated Tools:** Ask about the weather or check your calendar (via Cloud Functions).
+*   **📱 Responsive UI:** Includes both a development interface and a mobile-optimized view.
+*   **☁️ Cloud Ready:** Designed for easy deployment to Google Cloud Run.
 
+<!-- Optional: Add a GIF/Video Demo Here -->
+<!-- ![Demo GIF](assets/pastra-demo.gif) -->
 
-### Gemini 2.0 Integration
+## 🚀 Getting Started
 
-- Multimodal Live API for real-time streaming.
-- Low-latency responses with improved TTFT.
-- Enhanced function calling and multi-tool capabilities.
-- Bidirectional streaming with interruption support.
-- Advanced processing of combined audio, video, and text inputs.
+Choose your path: run locally for development or deploy straight to the cloud.
 
-## Getting Started
+**Prerequisites:**
 
-This section provides a quickstart guide to get the application up and running. For more detailed information on specific components, refer to the README files located in the `client/` and `server/` directories.
+*   Python 3.8+
+*   API Keys:
+    *   Google Gemini API Key ([Get one here](https://makersuite.google.com/app/apikey))
+    *   OpenWeather API Key ([Get one here](https://openweathermap.org/api) - for weather tool)
+*   Google Cloud SDK (`gcloud` CLI) (Recommended for cloud deployment & secrets)
+*   Deployed Tool Functions (See [Cloud Functions Guide](./cloud-functions/README.md))
 
-### Prerequisites
+---
 
-- Python 3.8+
-- API keys for:
-  - Google Gemini API
-  - OpenWeather API
-  - Google Cloud credentials (if deploying to Google Cloud)
+### 1. 💻 Run Locally
 
-### Installation
+1.  **Clone the repo:**
+    ```bash
+    git clone https://github.com/heiko-hotz/project-pastra-v2.git
+    cd project-pastra-v2
+    ```
 
-1. Clone the repository:
+2.  **Configure Backend:**
+    ```bash
+    cd server
+    cp .env.example .env
+    nano .env # Edit with your API keys & Function URLs
+    # --> See server/README.md for detailed .env options <--
+    ```
+    *   *Minimum required in `.env`:* `GOOGLE_API_KEY` (if not using Vertex/ADC), `WEATHER_FUNCTION_URL`, etc.
 
-```bash
-git clone https://github.com/heiko-hotz/project-pastra-v2.git
-cd project-pastra-v2
-```
+3.  **Run Backend:**
+    ```bash
+    pip install -r requirements.txt
+    python server.py
+    # Backend runs on localhost:8081
+    ```
 
-### Quickstart
+4.  **Run Frontend (in a *new* terminal):**
+    ```bash
+    cd ../client
+    python -m http.server 8000
+    # Frontend served on localhost:8000
+    ```
 
-Choose one of the following options: Local Development or Deployment to Google Cloud Run.
+5.  **Access:**
+    *   Dev UI: `http://localhost:8000/index.html`
+    *   Mobile UI: `http://localhost:8000/mobile.html`
 
-#### 1. Local Development
+---
 
-Follow these steps to run the application locally:
+### 2. ☁️ Deploy to Google Cloud Run
 
-1. **Configure Environment Variables:**
+This uses Cloud Build to containerize and deploy the client & server.
 
-   ```bash
-   # Navigate to the server directory
-   cd server
+1.  **Setup Google Cloud:**
+    *   Set your project: `gcloud config set project YOUR_PROJECT_ID`
+    *   Enable APIs (Run, Cloud Build, Secret Manager, etc.).
+    *   Create Secrets (`GOOGLE_API_KEY`, `OPENWEATHER_API_KEY`) in Secret Manager.
+    *   Create a Service Account (`pastra-backend`) with Secret Accessor role.
+    *   Deploy Tool Functions (See [Cloud Functions Guide](./cloud-functions/README.md)).
+    *   *(See the original README's [detailed Cloud Run setup steps](README.md#2-deploy-to-google-cloud-run) if needed)*
 
-   # Copy the example environment file
-   cp .env.example .env
+2.  **Deploy Backend:**
+    ```bash
+    # Make sure PROJECT_ID is set in your environment or cloudbuild.yaml
+    gcloud builds submit --config server/cloudbuild.yaml
+    ```
 
-   # Edit .env with your actual API keys and configuration
-   nano .env  # or use your preferred text editor
-   ```
+3.  **Get Backend URL:** Note the URL output by the previous command (or use `gcloud run services describe pastra-backend...`). Let's call it `YOUR_BACKEND_URL`.
 
-   The `.env.example` file contains required and optional environment variables.  At a minimum, set the following:
+4.  **Deploy Frontend:**
+    ```bash
+    # Pass the backend URL to the frontend build
+    gcloud builds submit --config client/cloudbuild.yaml --substitutions=_BACKEND_URL=YOUR_BACKEND_URL
+    ```
 
-   - `PROJECT_ID`: Your Google Cloud project ID (if using Vertex API).
-   - `VERTEX_LOCATION`: Your Google Cloud region (if using Vertex API).
-   - `GOOGLE_API_KEY`: Your Gemini API key (if using Dev API).
-   - `OPENWEATHER_API_KEY`: Your OpenWeather API key (if using weather tools).
-   -  Cloud Function URLs for tool integrations (e.g. `WEATHER_FUNCTION_URL`, `FORECAST_FUNCTION_URL`, `CALENDAR_FUNCTION_URL`) - *Note: The tool integrations require cloud functions to be deployed seperately, for more details see the `server/README.md` file*
+5.  **Access:** Get the frontend service URL (`gcloud run services describe pastra-ui...`) and open it in your browser.
 
-2. **Start the Backend Server:**
+---
 
-   ```bash
-   # Make sure you're in the server directory
-   cd server
+## 🏗️ Architecture Overview
 
-   # Install dependencies
-   pip install -r requirements.txt
+Project Pastra consists of:
 
-   # Start the server
-   python server.py
-   ```
+1.  **Client (`client/`):** Vanilla JS frontend handling UI, media capture, and WebSocket connection. ([Details](./client/README.md))
+2.  **Server (`server/`):** Python WebSocket server proxying to Gemini, managing sessions, and calling tools. ([Details](./server/README.md))
+3.  **Tools (`cloud-functions/`):** Google Cloud Functions providing external capabilities (weather, calendar). ([Details](./cloud-functions/README.md))
+4.  **Gemini API:** Google's multimodal AI model accessed via the Live API.
 
-   The backend server will start on `localhost:8081`.
+![Architecture Diagram](assets/architecture.png)
+*(User -> Client -> Server -> Gemini API / Tools -> Server -> Client -> User)*
 
-3. **Start the Frontend Client:**
+## 🔧 Tools & Configuration
 
-   ```bash
-   # Open a new terminal window
-   # Navigate to the client directory
-   cd client
+*   Tools like weather and calendar are implemented as separate Cloud Functions for modularity. See the [Cloud Functions README](./cloud-functions/README.md) for setup.
+*   Server configuration (API keys, Function URLs) is managed via environment variables and Google Cloud Secret Manager. See the [Server README](./server/README.md#configuration) for details.
 
-   # Start a simple HTTP server
-   python -m http.server 8000
-   ```
+## ❓ Troubleshooting
 
-4. **Access the Application:**
+*   **Local:** Check terminal output for errors. Ensure API keys and Function URLs in `.env` are correct.
+*   **Cloud Run:** Check Cloud Build and Cloud Run logs. Verify Service Account permissions and Secret Manager setup.
+*   See component READMEs (`client/`, `server/`, `cloud-functions/`) for more specific tips.
 
-   Open your web browser and navigate to:
+## 📜 License
 
-   - Development UI: `http://localhost:8000/index.html`
-   - Mobile-optimized UI: `http://localhost:8000/mobile.html`
+This project is licensed under the Apache License 2.0. See the [LICENSE](./LICENSE) file.
 
-5. **Test the Connection:**
+## 🤝 Contributing & Disclaimer
 
-   1. Open your browser's developer tools (F12).
-   2. Check the console for any connection errors.
-   3. Try sending a test message through the interface.
-   4. Verify that the WebSocket connection is established.
+This is a personal project by [Heiko Hotz](https://github.com/heiko-hotz) to explore Gemini capabilities. Suggestions and feedback are welcome via Issues or Pull Requests.
 
-#### 2. Deploy to Google Cloud Run
-
-This guide assumes you have the Google Cloud SDK (gcloud CLI) installed and configured.
-
-1. **Configure Project and Enable APIs**
-
-   If you haven't already, set your project ID:
-
-   ```bash
-   gcloud config set project YOUR_PROJECT_ID
-   ```
-
-   Enable required APIs:
-
-   ```bash
-   gcloud services enable run.googleapis.com cloudbuild.googleapis.com containerregistry.googleapis.com secretmanager.googleapis.com iam.googleapis.com
-   ```
-
-2. **Create a Service Account for the Backend**
-
-   ```bash
-   gcloud iam service-accounts create pastra-backend \\
-     --display-name="Pastra Backend Service Account"
-   ```
-
-3. **Grant Secret Manager Access to the Backend Service Account**
-
-   ```bash
-   gcloud projects add-iam-policy-binding \${PROJECT_ID} \\
-     --member="serviceAccount:pastra-backend@\${PROJECT_ID}.iam.gserviceaccount.com" \\
-     --role="roles/secretmanager.secretAccessor"
-   ```
-
-4. **Create Secrets in Secret Manager**
-
-   Create the necessary secrets (replace `your-api-key` with the actual keys):
-
-   ```bash
-   gcloud secrets create GOOGLE_API_KEY --replication-policy="automatic"
-   echo -n "your-api-key" | gcloud secrets versions add GOOGLE_API_KEY --data-file=-
-
-   gcloud secrets create OPENWEATHER_API_KEY --replication-policy="automatic"
-   echo -n "your-api-key" | gcloud secrets versions add OPENWEATHER_API_KEY --data-file=-
-
-    #If using more APIs:
-    #gcloud secrets create FINNHUB_API_KEY --replication-policy="automatic"
-    #echo -n "your-api-key" | gcloud secrets versions add FINNHUB_API_KEY --data-file=-
-   ```
-
-5. **Deploy the Backend to Cloud Run**
-
-   ```bash
-   gcloud builds submit --config server/cloudbuild.yaml
-   ```
-
-   This command builds the Docker image for the backend and deploys it to Cloud Run. The `cloudbuild.yaml` file contains the deployment configuration.
-
-6. **Deploy the Frontend to Cloud Run**
-
-   ```bash
-   #Get the backend url:
-   BACKEND_URL=$(gcloud run services describe pastra-backend --platform managed --region us-central1 --format 'value(status.url)')
-
-   # Deploy the Frontend to Cloud Run, passing the backend URL as a substitution variable:
-   gcloud builds submit --config client/cloudbuild.yaml \\
-     --substitutions=_BACKEND_URL=\$BACKEND_URL
-
-   This command builds the Docker image for the frontend and deploys it to Cloud Run.  Before running this, make sure you update the `client/cloudbuild.yaml` with the URL of your newly deployed backend.
-
- 7. **Access the Application**
-
-   After deployment is complete, Cloud Run provides a URL for each service (frontend and backend). Access the frontend URL in your browser to use the application.
-
-   ```bash
-   gcloud run services describe pastra-ui --platform managed --region us-central1 --format 'value(status.url)'
-   ```
-
-### Troubleshooting Common Startup Issues
-
-- See the "Local Development" section above for general troubleshooting.
-- **Cloud Run deployment issues:** Check Cloud Build logs for build and deployment errors.  Ensure the service account used by Cloud Run has the necessary permissions.
-- **Secret Manager access errors:**  Verify the service account has the `Secret Manager Secret Accessor` role.
-- **Connectivity issues:** Ensure your Cloud Run services allow unauthenticated access (for basic testing).
-
-## Architecture
-
-![Architecture Overview](assets/architecture.png)
-
-The architecture consists of:
-
-- **Client:** The frontend web application, responsible for user interaction and media handling. Refer to the `client/README.md` (coming soon) for more details.
-- **Server:**  A Python-based WebSocket server acting as a proxy and tool handler for the Gemini API. See the `server/README.md` file for detailed information.
-- **Tools:**  Cloud Functions providing specific functionalities like weather, calendar, etc.
-- **Gemini API:**  Google's AI model for processing requests and generating responses.
-
-The diagram illustrates the key components and data flow. A user request flows through the Proxy, Gemini API, Tool Handler, and relevant Tools (e.g., Weather Agent), eventually returning a natural language response to the user. The system utilizes components such as the Proxy, Tool Handler, Weather Agent (running in Cloud Run), Secret Manager, and the Gemini Multimodal Live API, all hosted within Google Cloud Platform (GCP).
-
-## Project Information
-
-### License
-
-This project is licensed under the Apache License.
-
-### Contributing
-
-This is a personal project, but suggestions and feedback are welcome! Feel free to open issues or submit pull requests. **Please note that this project is developed independently and does not reflect the views or efforts of Google.**
-
+**This project is developed independently and does not reflect the views or efforts of Google.**

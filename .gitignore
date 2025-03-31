@@ -181,8 +181,6 @@ server/tools/slidev_tool/slidev/*
 .aider*
 
 .venv/
-.venv-project-311/
-*frame*.png
 concatenate.py
 concatenated_files.txt
 google_copyright_html.txt

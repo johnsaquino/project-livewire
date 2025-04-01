@@ -38,6 +38,8 @@ Choose your path: run locally for development or deploy straight to the cloud.
 
 ### 1. 💻 Run Locally
 
+These are the basic steps. For more detailed instructions, see the **[Local Setup Guide](./docs/local_setup.md)**.
+
 1.  **Clone the repo:**
     ```bash
     git clone https://github.com/heiko-hotz/project-pastra-v2.git
@@ -75,7 +77,7 @@ Choose your path: run locally for development or deploy straight to the cloud.
 
 ### 2. ☁️ Deploy to Google Cloud Run
 
-This uses Cloud Build to containerize and deploy the client & server.
+This uses Cloud Build to containerize and deploy the client & server. For more detailed step-by-step instructions, refer to the **[Cloud Deployment Guide](./docs/cloud_deployment.md)**.
 
 1.  **Setup Google Cloud:**
     *   Set your project: `gcloud config set project YOUR_PROJECT_ID`
@@ -83,7 +85,6 @@ This uses Cloud Build to containerize and deploy the client & server.
     *   Create Secrets (`GOOGLE_API_KEY`, `OPENWEATHER_API_KEY`) in Secret Manager.
     *   Create a Service Account (`pastra-backend`) with Secret Accessor role.
     *   Deploy Tool Functions (See [Cloud Functions Guide](./cloud-functions/README.md)).
-    *   *(See the original README's [detailed Cloud Run setup steps](README.md#2-deploy-to-google-cloud-run) if needed)*
 
 2.  **Deploy Backend:**
     ```bash
@@ -98,6 +99,7 @@ This uses Cloud Build to containerize and deploy the client & server.
     # Pass the backend URL to the frontend build
     gcloud builds submit --config client/cloudbuild.yaml --substitutions=_BACKEND_URL=YOUR_BACKEND_URL
     ```
+    *(Note: Ensure client code uses the provided `_BACKEND_URL` instead of localhost. See `docs/cloud_deployment.md` for details).*
 
 5.  **Access:** Get the frontend service URL (`gcloud run services describe pastra-ui...`) and open it in your browser.
 
@@ -122,8 +124,8 @@ Project Pastra consists of:
 
 ## ❓ Troubleshooting
 
-*   **Local:** Check terminal output for errors. Ensure API keys and Function URLs in `.env` are correct.
-*   **Cloud Run:** Check Cloud Build and Cloud Run logs. Verify Service Account permissions and Secret Manager setup.
+*   **Local:** Check terminal output for errors. Ensure API keys and Function URLs in `.env` are correct. Consult the [Local Setup Guide](./docs/local_setup.md).
+*   **Cloud Run:** Check Cloud Build and Cloud Run logs. Verify Service Account permissions and Secret Manager setup. Consult the [Cloud Deployment Guide](./docs/cloud_deployment.md).
 *   See component READMEs (`client/`, `server/`, `cloud-functions/`) for more specific tips.
 
 ## 📜 License

@@ -16,12 +16,6 @@
 
 export class GeminiAPI {
     constructor(endpoint = null) {
-        // If no endpoint is provided, try to construct it from the current URL
-        if (!endpoint) {
-            // Use the backend URL directly
-            endpoint = 'wss://pastra-backend-x45vlhrf3a-uc.a.run.app';
-        }
-        
         this.endpoint = endpoint;
         this.ws = null;
         this.isSpeaking = false;

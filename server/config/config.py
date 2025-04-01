@@ -34,7 +34,7 @@ class ConfigurationError(Exception):
 def get_secret(secret_id: str) -> str:
     """Get secret from Secret Manager."""
     client = secretmanager.SecretManagerServiceClient()
-    project_id = os.environ.get('PROJECT_ID', 'heikohotz-genai-sa')
+    project_id = os.environ.get('PROJECT_ID')
     
     if not project_id:
         raise ConfigurationError("PROJECT_ID environment variable is not set")

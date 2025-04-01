@@ -4,7 +4,7 @@
 
 **Talk to AI like never before! Project Pastra is a real-time, multimodal chat application showcasing the power of Google's Gemini 2.0 Flash (experimental) Live API.**
 
-Think "Star Trek computer" interaction – speak naturally, show your webcam, share your screen, and get instant, streamed audio responses. Pastra brings this futuristic experience to your browser today.
+Think "Star Trek computer" interaction – speak naturally, show your webcam, share your screen, and get instant, streamed audio responses. Pastra brings this futuristic experience to your devices today.
 
 This project builds upon the concepts from the [Gemini Multimodal Live API Developer Guide](https://github.com/heiko-hotz/gemini-multimodal-live-dev-guide) with a focus on a more production-ready setup and enhanced features.
 

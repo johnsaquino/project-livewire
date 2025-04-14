@@ -42,8 +42,8 @@ These are the basic steps. For more detailed instructions, see the **[Local Setu
 
 1.  **Clone the repo:**
     ```bash
-    git clone https://github.com/heiko-hotz/project-pastra-v2.git
-    cd project-pastra-v2
+    git clone https://github.com/heiko-hotz/project-pastra.git
+    cd project-pastra
     ```
 
 2.  **Configure Backend:**

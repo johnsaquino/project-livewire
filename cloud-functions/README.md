@@ -8,7 +8,6 @@ This directory is organized into the following tool categories:
 
 ### Weather Tools
 - **`get-weather-tool`**:  Retrieves current weather data for a specified location.
-- **`get-forecast-tool`**: Provides a 5-day weather forecast for a given location.
 
 ### Calendar Tools
 - **`get-calendar-tool`**: Fetches the next upcoming calendar appointment from a configured Google Calendar.
@@ -112,16 +111,6 @@ Follow these steps to set up and deploy the Weather Cloud Functions.
          --source=get-weather-tool \\
          --region=us-central1
      ```
-   - Deploy the `get-forecast-tool` function:
-     ```bash
-     gcloud functions deploy get-forecast-tool \\
-         --runtime python310 \\
-         --trigger-http \\
-         --entry-point=get_forecast \\
-         --service-account="weather-function-sa@\$PROJECT_ID.iam.gserviceaccount.com" \\
-         --source=get-forecast-tool \\
-         --region=us-central1
-     ```
      **Note**: Replace `us-central1` with your desired Google Cloud region if needed.
 
 ## Calendar Tool Setup
@@ -205,9 +194,6 @@ cloud-functions/
 │   ├── get-weather-tool/
 │   │   ├── main.py
 │   │   └── requirements.txt
-│   └── get-forecast-tool/
-│       ├── main.py
-│       └── requirements.txt
 └── calendar-tools/
     └── get-calendar-tool/
         ├── main.py

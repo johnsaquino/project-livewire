@@ -182,10 +182,6 @@ After deploying the functions, you can test them using `curl` commands to ensure
   ```bash
   curl "YOUR_FUNCTION_URL/get-weather-tool?lat=51.5074&lon=-0.1278"
   ```
-- **Test `get-forecast-tool` with city name**:
-  ```bash
-  curl "YOUR_FUNCTION_URL/get-forecast-tool?city=London"
-  ```
 
 ### Calendar Function
 

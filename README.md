@@ -1,10 +1,8 @@
-# Project Pastra 🍝
+# Project Livewire 
 
-![Project Pastra Banner](assets/project_pastra.png)
+**Talk to AI like never before! Project Livewire is a real-time, multimodal chat application showcasing the power of Google's Gemini 2.0 Flash (experimental) Live API.**
 
-**Talk to AI like never before! Project Pastra is a real-time, multimodal chat application showcasing the power of Google's Gemini 2.0 Flash (experimental) Live API.**
-
-Think "Star Trek computer" interaction – speak naturally, show your webcam, share your screen, and get instant, streamed audio responses. Pastra brings this futuristic experience to your devices today.
+Think "Star Trek computer" interaction – speak naturally, show your webcam, share your screen, and get instant, streamed audio responses. Livewire brings this futuristic experience to your devices today.
 
 This project builds upon the concepts from the [Gemini Multimodal Live API Developer Guide](https://github.com/heiko-hotz/gemini-multimodal-live-dev-guide) with a focus on a more production-ready setup and enhanced features.
 
@@ -19,7 +17,7 @@ This project builds upon the concepts from the [Gemini Multimodal Live API Devel
 *   **☁️ Cloud Ready:** Designed for easy deployment to Google Cloud Run.
 
 <!-- Optional: Add a GIF/Video Demo Here -->
-<!-- ![Demo GIF](assets/pastra-demo.gif) -->
+<!-- ![Demo GIF](assets/livewire-demo.gif) -->
 
 ## 🚀 Getting Started
 
@@ -42,8 +40,8 @@ These are the basic steps. For more detailed instructions, see the **[Local Setu
 
 1.  **Clone the repo:**
     ```bash
-    git clone https://github.com/heiko-hotz/project-pastra.git
-    cd project-pastra
+    git clone https://github.com/heiko-hotz/project-livewire.git
+    cd project-livewire
     ```
 
 2.  **Configure Backend:**
@@ -83,7 +81,7 @@ This uses Cloud Build to containerize and deploy the client & server. For more d
     *   Set your project: `gcloud config set project YOUR_PROJECT_ID`
     *   Enable APIs (Run, Cloud Build, Secret Manager, etc.).
     *   Create Secrets (`GOOGLE_API_KEY`, `OPENWEATHER_API_KEY`) in Secret Manager.
-    *   Create a Service Account (`pastra-backend`) with Secret Accessor role.
+    *   Create a Service Account (`livewire-backend`) with Secret Accessor role.
     *   Deploy Tool Functions (See [Cloud Functions Guide](./cloud-functions/README.md)).
 
 2.  **Deploy Backend:**
@@ -92,7 +90,7 @@ This uses Cloud Build to containerize and deploy the client & server. For more d
     gcloud builds submit --config server/cloudbuild.yaml
     ```
 
-3.  **Get Backend URL:** Note the URL output by the previous command (or use `gcloud run services describe pastra-backend...`). Let's call it `YOUR_BACKEND_URL`.
+3.  **Get Backend URL:** Note the URL output by the previous command (or use `gcloud run services describe livewire-backend...`). Let's call it `YOUR_BACKEND_URL`.
 
 4.  **Deploy Frontend:**
     ```bash
@@ -101,13 +99,13 @@ This uses Cloud Build to containerize and deploy the client & server. For more d
     ```
     *(Note: Ensure client code uses the provided `_BACKEND_URL` instead of localhost. See `docs/cloud_deployment.md` for details).*
 
-5.  **Access:** Get the frontend service URL (`gcloud run services describe pastra-ui...`) and open it in your browser.
+5.  **Access:** Get the frontend service URL (`gcloud run services describe livewire-ui...`) and open it in your browser.
 
 ---
 
 ## 🏗️ Architecture Overview
 
-Project Pastra consists of:
+Project Livewire consists of:
 
 1.  **Client (`client/`):** Vanilla JS frontend handling UI, media capture, and WebSocket connection. ([Details](./client/README.md))
 2.  **Server (`server/`):** Python WebSocket server proxying to Gemini, managing sessions, and calling tools. ([Details](./server/README.md))

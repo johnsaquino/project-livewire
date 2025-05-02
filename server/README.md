@@ -1,10 +1,10 @@
-# Project Pastra - Server Component
+# Project Livewire - Server Component
 
-This README provides detailed information about the server-side component of Project Pastra. This server is a Python-based WebSocket application built using `websockets` and `google-genai` libraries. It acts as a proxy and tool handler for Google's Gemini 2.0 Flash (experimental) model and manages real-time communication between the client and the Gemini API.
+This README provides detailed information about the server-side component of Project Livewire. This server is a Python-based WebSocket application built using `websockets` and `google-genai` libraries. It acts as a proxy and tool handler for Google's Gemini 2.0 Flash (experimental) model and manages real-time communication between the client and the Gemini API.
 
 ## Overview
 
-The server component is the core backend logic of Project Pastra and is responsible for:
+The server component is the core backend logic of Project Livewire and is responsible for:
 
 - **WebSocket Communication:** Establishes and manages bidirectional, real-time communication with client applications (frontend UI) using WebSockets.
 - **Gemini API Interaction:**  Connects to and manages sessions with the Gemini Multimodal Live API to process user inputs (text, audio, video) and receive AI-generated responses.
@@ -69,8 +69,8 @@ This section guides you through setting up the server component for both local d
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/heiko-hotz/project-pastra.git
-   cd project-pastra/server
+   git clone https://github.com/heiko-hotz/project-livewire.git
+   cd project-livewire/server
    ```
 
 2. **Create a virtual environment (recommended):**
@@ -149,7 +149,7 @@ The server prioritizes configuration sources in the following order:
 2. **Retrieve the deployed service URL:**
    After successful deployment, get the URL of your Cloud Run service:
    ```bash
-   gcloud run services describe pastra-backend --platform managed --region us-central1 --format 'value(status.url)'
+   gcloud run services describe livewire-backend --platform managed --region us-central1 --format 'value(status.url)'
    ```
 
 3. **Get the Frontend URL:**
@@ -158,8 +158,8 @@ The server prioritizes configuration sources in the following order:
    # List all Cloud Run services to find the frontend service name
    gcloud run services list
 
-   # Get the frontend URL (replace 'pastra-frontend' with your frontend service name if different)
-   gcloud run services describe pastra-frontend --platform managed --region us-central1 --format 'value(status.url)'
+   # Get the frontend URL (replace 'livewire-frontend' with your frontend service name if different)
+   gcloud run services describe livewire-frontend --platform managed --region us-central1 --format 'value(status.url)'
    ```
 
    You can access the web application by opening the frontend URL in your browser.
@@ -176,7 +176,7 @@ You can easily test your deployed WebSocket server using `wscat`, a command-line
 2. **Save and prepare the server URL:**
    ```bash
    # Save the Cloud Run URL to a variable
-   export CLOUD_RUN_URL=$(gcloud run services describe pastra-backend --platform managed --region us-central1 --format 'value(status.url)')
+   export CLOUD_RUN_URL=$(gcloud run services describe livewire-backend --platform managed --region us-central1 --format 'value(status.url)')
    
    # Print the URL to verify (should start with https://)
    echo $CLOUD_RUN_URL

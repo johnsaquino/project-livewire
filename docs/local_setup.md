@@ -1,6 +1,6 @@
-# Project Pastra - Local Setup Guide
+# Project Livewire - Local Setup Guide
 
-This guide provides detailed instructions for setting up and running Project Pastra on your local machine for development and testing.
+This guide provides detailed instructions for setting up and running Project Livewire on your local machine for development and testing.
 
 ## Prerequisites
 
@@ -27,8 +27,8 @@ Before you begin, ensure you have the following installed and configured:
 
 1.  **Clone the Repository:**
     ```bash
-    git clone https://github.com/heiko-hotz/project-pastra.git
-    cd project-pastra
+    git clone https://github.com/heiko-hotz/project-livewire.git
+    cd project-livewire
     ```
 
 2.  **Backend Configuration (`.env` file):**
@@ -80,7 +80,7 @@ Before you begin, ensure you have the following installed and configured:
     *   Open a **new terminal window/tab**.
     *   Navigate to the client directory:
         ```bash
-        cd ../client # Or navigate from the project root: cd project-pastra/client
+        cd ../client # Or navigate from the project root: cd project-livewire/client
         ```
     *   Start a simple Python HTTP server:
         ```bash

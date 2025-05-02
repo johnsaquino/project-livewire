@@ -1,6 +1,6 @@
-# Project Pastra - Google Cloud Run Deployment Guide
+# Project Livewire - Google Cloud Run Deployment Guide
 
-This guide provides step-by-step instructions for deploying the Project Pastra client and server components as containerized services on Google Cloud Run. This setup is recommended for a scalable and managed production-like environment.
+This guide provides step-by-step instructions for deploying the Project Livewire client and server components as containerized services on Google Cloud Run. This setup is recommended for a scalable and managed production-like environment.
 
 ## Prerequisites
 
@@ -24,7 +24,7 @@ This guide provides step-by-step instructions for deploying the Project Pastra c
 4.  **Deployed Cloud Functions:** The backend server relies on Cloud Functions for tool integration (weather, calendar).
     *   Deploy these functions first by following the **[Cloud Functions Setup Guide](../cloud-functions/README.md)**.
     *   You do *not* need the function URLs in an `.env` file for Cloud Run deployment if you configure them via Secret Manager or pass them during backend deployment (though storing them in secrets is common).
-5.  **Git Repository:** You should have the Project Pastra code cloned locally.
+5.  **Git Repository:** You should have the Project Livewire code cloned locally.
 
 ## Setup Steps
 
@@ -34,13 +34,13 @@ The Cloud Run service for the backend needs an identity to securely access other
 
 ```bash
 # Define service account name (optional, adjust if needed)
-export BACKEND_SA_NAME="pastra-backend"
+export BACKEND_SA_NAME="livewire-backend"
 export PROJECT_ID=$(gcloud config get-value project)
 
 # Create the service account
 gcloud iam service-accounts create ${BACKEND_SA_NAME} \
-    --description="Service account for Project Pastra backend Cloud Run service" \
-    --display-name="Pastra Backend SA"
+    --description="Service account for Project Livewire backend Cloud Run service" \
+    --display-name="Livewire Backend SA"
 
 # Grant Secret Manager access to the service account
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
@@ -83,7 +83,7 @@ This uses Cloud Build (`server/cloudbuild.yaml`) to build the Docker image and d
 
 ```bash
 # Navigate to the project root directory
-cd /path/to/project-pastra
+cd /path/to/project-livewire
 
 # Submit the build and deployment job
 # This uses the configuration in server/cloudbuild.yaml
@@ -94,12 +94,12 @@ gcloud builds submit --config server/cloudbuild.yaml
 *   **What `server/cloudbuild.yaml` does:**
     *   Builds a Docker image using `server/Dockerfile`.
     *   Pushes the image to Google Container Registry (or Artifact Registry).
-    *   Deploys the image to Cloud Run as a service named `pastra-backend`.
+    *   Deploys the image to Cloud Run as a service named `livewire-backend`.
     *   Sets the region (default `us-central1` - modify YAML if needed).
     *   Allows unauthenticated access (for easy client connection - **consider restricting access in production**).
     *   Sets the container port to `8081`.
     *   Sets environment variables (`PROJECT_ID`, `LOG_LEVEL`). You can add more here (like `VERTEX_API=true`, `VERTEX_LOCATION`, or Function URLs if not using secrets).
-    *   Assigns the `pastra-backend` service account created earlier.
+    *   Assigns the `livewire-backend` service account created earlier.
 
 ### 4. Get the Backend Service URL
 
@@ -107,7 +107,7 @@ After the deployment finishes, retrieve the URL of the backend service.
 
 ```bash
 # Replace us-central1 if you deployed to a different region
-export BACKEND_URL=$(gcloud run services describe pastra-backend --platform managed --region us-central1 --format 'value(status.url)')
+export BACKEND_URL=$(gcloud run services describe livewire-backend --platform managed --region us-central1 --format 'value(status.url)')
 
 # Verify the URL (should start with https://...)
 echo "Backend URL: ${BACKEND_URL}"
@@ -120,7 +120,7 @@ This uses Cloud Build (`client/cloudbuild.yaml`) to build the client's Docker im
 
 ```bash
 # Navigate to the project root directory (if not already there)
-cd /path/to/project-pastra
+cd /path/to/project-livewire
 
 # Construct the WebSocket URL for the backend
 export WSS_BACKEND_URL=$(echo ${BACKEND_URL} | sed 's|https://|wss://|')
@@ -135,7 +135,7 @@ gcloud builds submit --config client/cloudbuild.yaml \
 *   **What `client/cloudbuild.yaml` does:**
     *   Builds a Docker image using `client/Dockerfile`.
     *   Pushes the image to Google Container Registry (or Artifact Registry).
-    *   Deploys the image to Cloud Run as a service named `pastra-ui`.
+    *   Deploys the image to Cloud Run as a service named `livewire-ui`.
     *   Sets the region (default `us-central1` - modify YAML if needed).
     *   Allows unauthenticated access.
     *   Sets the container port to `8080`.
@@ -148,7 +148,7 @@ Retrieve the URL for the deployed UI service.
 
 ```bash
 # Replace us-central1 if you deployed to a different region
-export FRONTEND_URL=$(gcloud run services describe pastra-ui --platform managed --region us-central1 --format 'value(status.url)')
+export FRONTEND_URL=$(gcloud run services describe livewire-ui --platform managed --region us-central1 --format 'value(status.url)')
 
 # Print the URL
 echo "Frontend URL: ${FRONTEND_URL}"
@@ -156,7 +156,7 @@ echo "Frontend URL: ${FRONTEND_URL}"
 
 ### 7. Access the Application
 
-Open the `FRONTEND_URL` in your web browser to use the deployed Project Pastra application.
+Open the `FRONTEND_URL` in your web browser to use the deployed Project Livewire application.
 
 ## Troubleshooting
 
@@ -164,11 +164,11 @@ Open the `FRONTEND_URL` in your web browser to use the deployed Project Pastra a
     *   Check the Cloud Build logs in the Google Cloud Console for detailed error messages.
     *   Ensure the Cloud Build service account has necessary permissions (e.g., to push to Container Registry, deploy to Cloud Run).
 *   **Cloud Run Service Errors:**
-    *   Check the "Logs" tab for your `pastra-backend` and `pastra-ui` services in the Cloud Run section of the Google Cloud Console.
+    *   Check the "Logs" tab for your `livewire-backend` and `livewire-ui` services in the Cloud Run section of the Google Cloud Console.
     *   **Backend:** Look for errors related to Secret Manager access (check IAM roles), API key validity, connection issues to Gemini, or problems calling Cloud Functions. Ensure `PROJECT_ID` is correctly passed or available.
     *   **Frontend:** Look for nginx errors or issues serving files. Ensure the backend URL was correctly passed during the build and is accessible.
 *   **Connection Issues (Client <-> Server):**
-    *   Verify the WebSocket URL used by the client correctly points to the `wss://` version of the `pastra-backend` service URL.
+    *   Verify the WebSocket URL used by the client correctly points to the `wss://` version of the `livewire-backend` service URL.
     *   Ensure both Cloud Run services allow ingress traffic (e.g., `--allow-unauthenticated` was used, or appropriate authentication is configured if restricted). Check firewall rules if applicable.
-*   **Secret Manager Access Denied:** Double-check that the `pastra-backend` service account has the `roles/secretmanager.secretAccessor` role assigned in IAM.
+*   **Secret Manager Access Denied:** Double-check that the `livewire-backend` service account has the `roles/secretmanager.secretAccessor` role assigned in IAM.
 *   **Quota Errors:** Monitor API usage (Gemini, Cloud Functions, etc.) in the Google Cloud Console. You might be hitting free tier limits or project quotas.

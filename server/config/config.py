@@ -84,10 +84,11 @@ api_config = ApiConfig()
 
 # Model configuration
 if api_config.use_vertex:
-    MODEL = os.getenv('MODEL_VERTEX_API', 'gemini-2.0-flash-exp')
+    # Supported Live models: gemini-live-2.5-flash (Private GA), gemini-live-2.5-flash-preview-native-audio (Public preview)
+    MODEL = os.getenv('MODEL_VERTEX_API', 'gemini-live-2.5-flash-preview-native-audio')
     VOICE = os.getenv('VOICE_VERTEX_API', 'Aoede')
 else:
-    MODEL = os.getenv('MODEL_DEV_API', 'models/gemini-2.0-flash-exp')
+    MODEL = os.getenv('MODEL_DEV_API', 'models/gemini-live-2.5-flash-preview-native-audio')
     VOICE = os.getenv('VOICE_DEV_API', 'Puck')
 
 # Cloud Function URLs with validation
@@ -115,11 +116,18 @@ except Exception as e:
 
 logger.info(f"System instructions: {SYSTEM_INSTRUCTIONS}")
 
-# Gemini Configuration
+# Gemini Configuration (Multimodal Live)
+# Note: Live API uses top-level response_modalities and speech_config; system_instruction is Content-like
 CONFIG = {
-    "generation_config": {
-        "response_modalities": ["AUDIO"],
-        "speech_config": VOICE
+    # Ask model to return audio
+    "response_modalities": ["AUDIO"],
+    # Select a prebuilt TTS voice
+    "speech_config": {
+        "voice_config": {
+            "prebuilt_voice_config": {
+                "voice_name": VOICE
+            }
+        }
     },
     "tools": [{
         "function_declarations": [
@@ -139,5 +147,8 @@ CONFIG = {
             },
         ]
     }],
-    "system_instruction": SYSTEM_INSTRUCTIONS
-} 
+    # Convert system instructions into a Content-like structure if provided
+    "system_instruction": (
+        {"parts": [{"text": SYSTEM_INSTRUCTIONS}]} if SYSTEM_INSTRUCTIONS else None
+    ),
+}

@@ -94,13 +94,11 @@ async def handle_messages(websocket: Any, session: SessionState) -> None:
                         "data": "⚠️ Quota exceeded. Please wait a moment and try again in a few minutes."
                     }))
                     handled = True
-                    break
                 except Exception as send_err:
                     logger.error(f"Failed to send quota error message: {send_err}")
             elif "connection closed" in str(exc).lower():
                 logger.info("WebSocket connection closed")
                 handled = True
-                break
         
         if not handled:
             # For other errors, log and re-raise
@@ -147,21 +145,32 @@ async def handle_client_messages(websocket: Any, session: SessionState) -> None:
                 if "type" in data:
                     if data["type"] == "audio":
                         logger.debug("Sending audio to Gemini...")
-                        await session.genai_session.send(input={
-                            "data": data.get("data"),
-                            "mime_type": "audio/pcm"
-                        }, end_of_turn=True)
+                        audio_b64 = data.get("data")
+                        audio_bytes = base64.b64decode(audio_b64) if isinstance(audio_b64, str) else audio_b64
+                        await session.genai_session.send(
+                            input={
+                                "data": audio_bytes,
+                                # Input audio must be 16-bit PCM at 16kHz
+                                "mime_type": "audio/pcm;rate=16000",
+                            },
+                            end_of_turn=True,
+                        )
                         logger.debug("Audio sent to Gemini")
                     elif data["type"] == "image":
                         logger.info("Sending image to Gemini...")
-                        await session.genai_session.send(input={
-                            "data": data.get("data"),
-                            "mime_type": "image/jpeg"
-                        })
+                        await session.genai_session.send(
+                            input={
+                                "data": data.get("data"),
+                                "mime_type": "image/jpeg",
+                            }
+                        )
                         logger.info("Image sent to Gemini")
                     elif data["type"] == "text":
                         logger.info("Sending text to Gemini...")
-                        await session.genai_session.send(input=data.get("data"), end_of_turn=True)
+                        await session.genai_session.send(
+                            input=data.get("data"),
+                            end_of_turn=True,
+                        )
                         logger.info("Text sent to Gemini")
                     elif data["type"] == "end":
                         logger.info("Received end signal")

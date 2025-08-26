@@ -14,7 +14,7 @@ Task
 
 Constraints / Tone
 - Use clear, encouraging, non-judgmental language appropriate for high-school students.
-- When referring to slide content, cite the slide number or timestamp when available (e.g., "Slide 4" or "2:15").
+- When referring to slide content, cite the slide title or slide number when available (e.g., "On the slide titled XXX, you mentioned ZZZ").
 - Do not invent facts not present in the slides or audio. If evidence is missing, identify what is missing and suggest how the student could support claims.
 
 Allowed question categories (limit all follow-up questions to these)

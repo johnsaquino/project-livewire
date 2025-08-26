@@ -27,6 +27,7 @@ from google.genai import types
 from core.tool_handler import execute_tool
 from core.session import create_session, remove_session, SessionState
 from core.gemini_client import create_gemini_session
+from core.incremental_summary import IncrementalSummaryManager
 
 logger = logging.getLogger(__name__)
 
@@ -174,6 +175,14 @@ async def handle_client_messages(websocket: Any, session: SessionState) -> None:
                         logger.info("Text sent to Gemini")
                     elif data["type"] == "end":
                         logger.info("Received end signal")
+                        # Inject summary and trigger question turn
+                        try:
+                            if session.summary_manager:
+                                # Ensure latest update before questions
+                                await session.summary_manager.maybe_update()
+                                await session.summary_manager.inject_summary_for_questions()
+                        except Exception as e:
+                            logger.warning(f"Failed to inject summary/questions: {e}")
                     else:
                         logger.warning(f"Unsupported message type: {data.get('type')}")
             except Exception as e:
@@ -306,6 +315,17 @@ async def process_server_content(websocket: Any, session: SessionState, server_c
                     "type": "text",
                     "data": part.text
                 }))
+    # Collect transcriptions to drive incremental summary
+    if getattr(server_content, 'input_transcription', None):
+        try:
+            t = server_content.input_transcription
+            if getattr(t, 'text', None):
+                if session.summary_manager:
+                    session.summary_manager.add_transcript(t.text)
+                    # Opportunistically schedule an update; it's time-gated inside
+                    asyncio.create_task(session.summary_manager.maybe_update())
+        except Exception:
+            pass
     
     if server_content.turn_complete:
         await websocket.send(json.dumps({
@@ -323,6 +343,8 @@ async def handle_client(websocket: Any) -> None:
         # Create and initialize Gemini session
         async with await create_gemini_session() as gemini_session:
             session.genai_session = gemini_session
+            # Initialize incremental summary manager
+            session.summary_manager = IncrementalSummaryManager(session)
             
             # Send ready message to client
             await websocket.send(json.dumps({"ready": True}))

@@ -105,6 +105,25 @@ except Exception as e:
 
 logger.info(f"System instructions: {SYSTEM_INSTRUCTIONS}")
 
+# Incremental summary / compaction settings
+# Controls background summarization of long presentations to fit the Live API context.
+INCREMENTAL_UPDATES_ENABLED = os.getenv('INCREMENTAL_UPDATES_ENABLED', 'true').lower() == 'true'
+INCREMENTAL_SUMMARY_INTERVAL_SEC = int(os.getenv('INCREMENTAL_SUMMARY_INTERVAL_SEC', '60'))  # how often to update summary
+INCREMENTAL_SUMMARY_MIN_CHARS = int(os.getenv('INCREMENTAL_SUMMARY_MIN_CHARS', '500'))      # minimum new chars to trigger an update
+INCREMENTAL_SUMMARY_MAX_TOKENS = int(os.getenv('INCREMENTAL_SUMMARY_MAX_TOKENS', '1024'))   # cap summary size from generator
+INCREMENTAL_SUMMARY_MODEL = os.getenv('INCREMENTAL_SUMMARY_MODEL', 'gemini-2.5-flash')      # text model for offline summarization
+THOUGHTFUL_QUESTIONS_PROMPT = os.getenv('THOUGHTFUL_QUESTIONS_PROMPT',
+    'Using the summary of the presentation, ask 3-5 thoughtful, specific questions that probe understanding, evidence, and implications. Keep them concise.').strip()
+
+# A small, focused prompt the model uses to compress context.
+INCREMENTAL_SUMMARY_PROMPT = os.getenv('INCREMENTAL_SUMMARY_PROMPT', """
+You are maintaining a running, compact summary of a presentation so far.
+- Summarize only what has been presented (no hallucinations).
+- Preserve key claims, evidence, examples, and references to visuals if mentioned.
+- Prefer bullet points. Keep under ~1000 words.
+Return only the summary text (no preamble).
+""").strip()
+
 # Gemini Configuration (Multimodal Live)
 # Note: Live API uses top-level response_modalities and speech_config; system_instruction is Content-like
 CONFIG = {
@@ -141,4 +160,7 @@ CONFIG = {
     "system_instruction": (
         {"parts": [{"text": SYSTEM_INSTRUCTIONS}]} if SYSTEM_INSTRUCTIONS else None
     ),
+    # Enable server-side transcriptions, used to build an incremental summary
+    "input_audio_transcription": {},
+    "output_audio_transcription": {},
 }

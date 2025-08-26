@@ -29,6 +29,7 @@ class SessionState:
     current_audio_stream: Optional[Any] = None
     genai_session: Optional[Any] = None
     received_model_response: bool = False  # Track if we've received a model response in current turn
+    summary_manager: Optional[Any] = None  # Injected incremental summary manager
 
 # Global session storage
 active_sessions: Dict[str, SessionState] = {}

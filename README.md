@@ -73,7 +73,7 @@ These are the basic steps. For more detailed instructions, see the **[Local Setu
 
 ---
 
-### 2. ☁️ Deploy to Google Cloud Run
+### 2. Option A: ☁️ Deploy to Google Cloud Run
 
 This uses Cloud Build to containerize and deploy the client & server. For more detailed step-by-step instructions, refer to the **[Cloud Deployment Guide](./docs/cloud_deployment.md)**.
 
@@ -102,6 +102,86 @@ This uses Cloud Build to containerize and deploy the client & server. For more d
 5.  **Access:** Get the frontend service URL (`gcloud run services describe livewire-ui...`) and open it in your browser.
 
 ---
+
+### 2. Option B: ⚡ Quick Prototype Deploy (Cloud Run + inline API key)
+
+Fastest path to a shareable prototype. Deploy backend and frontend to Cloud Run, and pass the backend URL to the client via a `?ws=` query param. No Secret Manager or service accounts required.
+
+Summary
+- Backend: Cloud Run service `livewire-backend` (port 8081) with env `GOOGLE_API_KEY`.
+- Frontend: Cloud Run service `livewire-ui` (nginx static hosting).
+- Client: Accepts `?ws=` (normalizes https→wss, adds scheme if missing).
+
+Steps
+1) Prereqs
+     - gcloud installed and authenticated
+     - Project and region set:
+         ```bash
+         gcloud config set project YOUR_PROJECT_ID
+         gcloud config set run/region us-central1
+         gcloud services enable run.googleapis.com cloudbuild.googleapis.com containerregistry.googleapis.com
+         ```
+
+2) Backend (build + deploy)
+     ```bash
+     gcloud builds submit --tag gcr.io/$(gcloud config get-value project)/livewire-backend server
+     gcloud run deploy livewire-backend \
+         --image gcr.io/$(gcloud config get-value project)/livewire-backend \
+         --platform managed \
+         --region $(gcloud config get-value run/region) \
+         --allow-unauthenticated \
+         --port 8081 \
+         --set-env-vars LOG_LEVEL=INFO,GOOGLE_API_KEY=YOUR_GEMINI_API_KEY
+     export BACKEND_URL=$(gcloud run services describe livewire-backend --platform managed --region $(gcloud config get-value run/region) --format 'value(status.url)')
+     export WSS_BACKEND_URL=$(echo ${BACKEND_URL} | sed 's|https://|wss://|')
+     ```
+
+3) Frontend (build + deploy)
+     ```bash
+     gcloud builds submit --config client/cloudbuild.yaml
+     # If needed, allow public access:
+     gcloud run services add-iam-policy-binding livewire-ui \
+         --region $(gcloud config get-value run/region) \
+         --member=allUsers \
+         --role=roles/run.invoker
+     export FRONTEND_URL=$(gcloud run services describe livewire-ui --platform managed --region $(gcloud config get-value run/region) --format 'value(status.url)')
+     ```
+
+4) Share the link
+- Mobile/default UI: `${FRONTEND_URL}/?ws=${WSS_BACKEND_URL}`
+- Desktop UI: `${FRONTEND_URL}/index.html?ws=${WSS_BACKEND_URL}`
+
+Pros
+- Very fast; minimal setup.
+- Frontend doesn’t need rebuilds when backend URL changes—just update `?ws=`.
+
+Cons
+- API key stored as a Cloud Run env var (less secure than Secret Manager).
+- Not intended for production; prefer Option B for security and IAM.
+- Requires including `?ws=` in the URL (defaults to localhost without it).
+
+How to update this prototype
+- Backend code changes:
+    ```bash
+    gcloud builds submit --tag gcr.io/$(gcloud config get-value project)/livewire-backend server
+    gcloud run deploy livewire-backend \
+        --image gcr.io/$(gcloud config get-value project)/livewire-backend \
+        --region $(gcloud config get-value run/region) \
+        --platform managed \
+        --allow-unauthenticated \
+        --port 8081 \
+        --set-env-vars LOG_LEVEL=INFO,GOOGLE_API_KEY=YOUR_GEMINI_API_KEY
+    ```
+    The service URL is stable; existing `?ws=` links keep working.
+
+- Frontend code/assets changes:
+    ```bash
+    gcloud builds submit --config client/cloudbuild.yaml
+    ```
+    The frontend URL is stable; re-use the same link.
+
+Upgrade path
+- When ready, move to Option B (Secret Manager + service account) for better security. See `docs/cloud_deployment.md`.
 
 ## 🏗️ Architecture Overview
 

@@ -12,7 +12,7 @@ This project builds upon the concepts from the [Gemini Multimodal Live API Devel
 *   **👁️ Multimodal Input:** Combines voice, text, webcam video, and screen sharing.
 *   **🔊 Streamed Audio Output:** Hear responses instantly as they are generated.
 *   **↩️ Interruptible:** Talk over the AI, just like a real conversation.
-*   **🛠️ Integrated Tools:** Ask about the weather or check your calendar (via Cloud Functions).
+*   **🛠️ Optional Tools:** The server can call external tools via Cloud Functions (none enabled by default).
 *   **📱 Responsive UI:** Includes both a development interface and a mobile-optimized view.
 *   **☁️ Cloud Ready:** Designed for easy deployment to Google Cloud Run.
 
@@ -28,7 +28,6 @@ Choose your path: run locally for development or deploy straight to the cloud.
 *   Python 3.8+
 *   API Keys:
     *   Google Gemini API Key ([Get one here](https://makersuite.google.com/app/apikey))
-    *   OpenWeather API Key ([Get one here](https://openweathermap.org/api) - for weather tool)
 *   Google Cloud SDK (`gcloud` CLI) (Recommended for cloud deployment & secrets)
 *   Deployed Tool Functions (See [Cloud Functions Guide](./cloud-functions/README.md))
 
@@ -51,7 +50,7 @@ These are the basic steps. For more detailed instructions, see the **[Local Setu
     nano .env # Edit with your API keys & Function URLs
     # --> See server/README.md for detailed .env options <--
     ```
-    *   *Minimum required in `.env`:* `GOOGLE_API_KEY` (if not using Vertex/ADC), `WEATHER_FUNCTION_URL`, etc.
+    *   *Minimum required in `.env`:* `GOOGLE_API_KEY` (if not using Vertex/ADC).
 
 3.  **Run Backend:**
     ```bash
@@ -80,7 +79,7 @@ This uses Cloud Build to containerize and deploy the client & server. For more d
 1.  **Setup Google Cloud:**
     *   Set your project: `gcloud config set project YOUR_PROJECT_ID`
     *   Enable APIs (Run, Cloud Build, Secret Manager, etc.).
-    *   Create Secrets (`GOOGLE_API_KEY`, `OPENWEATHER_API_KEY`) in Secret Manager.
+    *   Create Secrets (`GOOGLE_API_KEY`) in Secret Manager.
     *   Create a Service Account (`livewire-backend`) with Secret Accessor role.
     *   Deploy Tool Functions (See [Cloud Functions Guide](./cloud-functions/README.md)).
 

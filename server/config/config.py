@@ -61,15 +61,6 @@ class ApiConfig:
     
     async def initialize(self):
         """Initialize API credentials."""
-        try:
-            # Always try to get OpenWeather API key regardless of endpoint
-            self.weather_api_key = get_secret('OPENWEATHER_API_KEY')
-        except Exception as e:
-            logger.warning(f"Failed to get OpenWeather API key from Secret Manager: {e}")
-            self.weather_api_key = os.getenv('OPENWEATHER_API_KEY')
-            if not self.weather_api_key:
-                raise ConfigurationError("OpenWeather API key not available")
-
         if not self.use_vertex:
             try:
                 self.api_key = get_secret('GOOGLE_API_KEY')
@@ -91,12 +82,10 @@ else:
     MODEL = os.getenv('MODEL_DEV_API', 'models/gemini-live-2.5-flash-preview-native-audio')
     VOICE = os.getenv('VOICE_DEV_API', 'Puck')
 
-# Cloud Function URLs with validation
+# Cloud Function URLs (none by default). Leave a commented example for future use.
 CLOUD_FUNCTIONS = {
-    "get_weather": os.getenv('WEATHER_FUNCTION_URL'),
-    "get_weather_forecast": os.getenv('FORECAST_FUNCTION_URL'),
-    "get_next_appointment": os.getenv('CALENDAR_FUNCTION_URL'),
-    "get_past_appointments": os.getenv('PAST_APPOINTMENTS_FUNCTION_URL'),
+    # Example template:
+    # "my_example_tool": os.getenv('MY_EXAMPLE_TOOL_URL'),
 }
 
 # Validate Cloud Function URLs
@@ -131,20 +120,21 @@ CONFIG = {
     },
     "tools": [{
         "function_declarations": [
-            {
-                "name": "get_weather",
-                "description": "Get weather information for a location",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "city": {
-                            "type": "string",
-                            "description": "The city or location to get weather for"
-                        }
-                    },
-                    "required": ["city"]
-                }
-            },
+            # Example template (commented) to add a future tool:
+            # {
+            #     "name": "my_example_tool",
+            #     "description": "Describe what the tool does",
+            #     "parameters": {
+            #         "type": "object",
+            #         "properties": {
+            #             "arg1": {
+            #                 "type": "string",
+            #                 "description": "Describe arg1"
+            #             }
+            #         },
+            #         "required": ["arg1"]
+            #     }
+            # },
         ]
     }],
     # Convert system instructions into a Content-like structure if provided

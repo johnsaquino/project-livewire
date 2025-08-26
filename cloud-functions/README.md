@@ -64,9 +64,8 @@ The Cloud Functions use Google Cloud Secret Manager to securely store API keys a
    - Give each service account the "Secret Manager Secret Accessor" role so they can retrieve secrets.
      ```bash
      # Grant access to weather function service account
-     gcloud projects add-iam-policy-binding \$PROJECT_ID \\
          --member="serviceAccount:weather-function-sa@\$PROJECT_ID.iam.gserviceaccount.com" \\
-         --role="roles/secretmanager.secretAccessor"
+    > Note: This repo no longer ships weather or calendar tools. Add your own functions as needed.
 
      # Grant access to calendar function service account
      gcloud projects add-iam-policy-binding \$PROJECT_ID \\
@@ -75,7 +74,7 @@ The Cloud Functions use Google Cloud Secret Manager to securely store API keys a
      ```
 
 3. **Store API Keys and Credentials in Secret Manager**:
-   - Store the OpenWeather API key and the Calendar service account key in Secret Manager.
+  - Store any tool-specific secrets in Secret Manager as needed.
 
      ```bash
      # Store OpenWeather API key
@@ -95,9 +94,8 @@ The Cloud Functions use Google Cloud Secret Manager to securely store API keys a
 
 Follow these steps to set up and deploy the Weather Cloud Functions.
 
-1. **Get OpenWeather API Key**:
-   - Sign up for an account at [OpenWeatherMap](https://openweathermap.org/api) and obtain an API key.
-   - Store this API key in Secret Manager as `OPENWEATHER_API_KEY` as described in the Secret Management Setup section.
+1. **Decide what your tool needs**:
+  - Create and store any required API keys or service accounts in Secret Manager.
 
 2. **Deploy Weather Functions**:
    - Navigate to the `cloud-functions/weather-tools/` directory.
@@ -168,17 +166,9 @@ After deploying the functions, you can test them using `curl` commands to ensure
   curl "YOUR_FUNCTION_URL/get-weather-tool?city=London"
   ```
 - **Test `get-weather-tool` with latitude and longitude**:
-  ```bash
-  curl "YOUR_FUNCTION_URL/get-weather-tool?lat=51.5074&lon=-0.1278"
   ```
 
 ### Calendar Function
-
-- **Test `get-calendar-tool` (if `CALENDAR_ID` is set as environment variable during deployment)**:
-  ```bash
-  curl "YOUR_FUNCTION_URL/get-calendar-tool"
-  ```
-- **Test `get-calendar-tool` with specific calendar ID as a parameter**:
   ```bash
   curl "YOUR_FUNCTION_URL/get-calendar-tool?calendar_id=your.calendar@gmail.com"
   ```

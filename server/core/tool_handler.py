@@ -19,7 +19,7 @@ Tool execution and handling for Gemini Multimodal Live Proxy Server
 import logging
 import aiohttp
 from typing import Dict, Any
-from config.config import CLOUD_FUNCTIONS
+from config.config import CLOUD_FUNCTIONS  # Populated when you add tool URLs in config (optional)
 from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
@@ -27,9 +27,12 @@ logger = logging.getLogger(__name__)
 async def execute_tool(tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
     """Execute a tool based on name and parameters by calling the corresponding cloud function"""
     try:
-        if tool_name not in CLOUD_FUNCTIONS:
-            logger.error(f"Tool not found: {tool_name}")
-            return {"error": f"Unknown tool: {tool_name}"}
+        if tool_name not in CLOUD_FUNCTIONS or not CLOUD_FUNCTIONS.get(tool_name):
+            logger.warning(f"Tool not configured: {tool_name}")
+            return {
+                "error": f"Tool '{tool_name}' is not configured",
+                "tool": tool_name,
+            }
 
         base_url = CLOUD_FUNCTIONS[tool_name]
         # Convert params to URL query parameters

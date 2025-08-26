@@ -4,8 +4,8 @@ This directory contains various tools that are deployed as Google Cloud Function
 
 ## Tools Overview
 
-### Weather Tools
-- **get-weather-tool**: Retrieves current weather data for a specified location
+### Example Tools
+- This folder previously included a sample weather tool. You can replace it with your own Cloud Function tools as needed.
 
 ## Prerequisites
 
@@ -42,57 +42,35 @@ This directory contains various tools that are deployed as Google Cloud Function
        --role="roles/secretmanager.secretAccessor"
    ```
 
-3. **Store API Keys in Secret Manager**:
-   ```bash
-   # Store OpenWeather API key
-   echo -n "your-openweather-api-key" | \
-     gcloud secrets create OPENWEATHER_API_KEY \
-     --data-file=- \
-     --replication-policy="automatic"
+3. **Store any tool secrets in Secret Manager** as required by your function.
 
-   # Store Calendar service account key (after downloading from Google Cloud Console)
-   gcloud secrets create CALENDAR_SERVICE_ACCOUNT \
-     --data-file=path/to/service-account-key.json \
-     --replication-policy="automatic"
-   ```
+## Example Deployment
 
-## Weather Tools Setup
-
-1. **Get OpenWeather API Key**:
-   - Sign up at [OpenWeatherMap](https://openweathermap.org/api)
-   - Get your API key
-   - Store it in Secret Manager (see above)
-
-2. **Deploy Weather Functions**:
-   ```bash
-   # Deploy get-weather function
-   gcloud functions deploy get-weather-tool \
-       --runtime python310 \
-       --trigger-http \
-       --entry-point=get_weather \
-       --service-account="weather-function-sa@$PROJECT_ID.iam.gserviceaccount.com" \
-       --source=cloud-functions/weather-tools/get-weather-tool \
-       --region=us-central1
-   ```
+Deploy your own function(s) per their language/runtime guide. Example:
+```bash
+gcloud functions deploy my-example-tool \
+   --runtime python312 \
+   --trigger-http \
+   --entry-point=handler \
+   --service-account="weather-function-sa@$PROJECT_ID.iam.gserviceaccount.com" \
+   --source=cloud-functions/weather-tools/my-example-tool \
+   --region=us-central1
+```
 
 ## Testing the Functions
 
-### Weather Functions
 ```bash
-# Test get-weather with city
-curl "https://YOUR_FUNCTION_URL/get-weather-tool?city=London"
-
-# Test get-weather with coordinates
-curl "https://YOUR_FUNCTION_URL/get-weather-tool?lat=51.5074&lon=-0.1278"
+# Example test call
+curl "https://YOUR_FUNCTION_URL/my-example-tool?arg1=value"
 ```
 
 ## Project Structure
 ```
 cloud-functions/
 ├── weather-tools/
-│   ├── get-weather-tool/
-│   │   ├── main.py
-│   │   └── requirements.txt
+│   └── my-example-tool/
+│       ├── main.py
+│       └── requirements.txt
 ```
 
 ## Security Notes

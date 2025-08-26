@@ -46,9 +46,7 @@ Before you begin, ensure you have the following installed and configured:
         ```
     *   **Fill in the required values:**
         *   `GOOGLE_API_KEY`: **Required** if *not* using Vertex AI or ADC. Paste your Gemini API key here.
-        *   `WEATHER_FUNCTION_URL`: **Required** for the weather tool. Paste the trigger URL of your deployed `get-weather-tool` function.
-        *   `CALENDAR_FUNCTION_URL`: **Required** for the calendar tool. Paste the trigger URL of your deployed `get-calendar-tool` function.
-        *   `OPENWEATHER_API_KEY`: **Required** if *not* storing it in Secret Manager and accessing via ADC. Paste your OpenWeather API key here.
+    *   (Optional) Custom tool URLs, e.g. `MY_EXAMPLE_TOOL_URL` if you add a future tool.
     *   **Optional/Advanced Configuration:**
         *   `PROJECT_ID`: Your Google Cloud Project ID. Required if using Vertex AI or accessing secrets via ADC.
         *   `VERTEX_LOCATION`: Google Cloud region (e.g., `us-central1`). Required if using Vertex AI.
@@ -114,6 +112,6 @@ Before you begin, ensure you have the following installed and configured:
 *   **Tool Function Errors (e.g., Weather):**
     *   Verify the `*_FUNCTION_URL`s in your `.env` file are correct and point to your *deployed* Cloud Functions.
     *   Ensure the Cloud Functions themselves are working correctly (test them directly using `curl` as shown in the [Cloud Functions README](../cloud-functions/README.md#testing-the-functions)).
-    *   Check if the necessary API keys (like `OPENWEATHER_API_KEY`) are correctly configured either in `.env` or accessible via Secret Manager/ADC.
+    *   Check if the necessary API keys (like `GOOGLE_API_KEY`) are correctly configured either in `.env` or accessible via Secret Manager/ADC.
 *   **Port Conflicts:** If `8081` or `8000` are already in use, the servers might fail to start. Stop the conflicting process or configure the servers/client to use different ports (requires code changes).
 *   **Microphone/Webcam Access Denied:** Ensure you grant permission in your browser when prompted. Check browser settings if you previously denied access.

@@ -148,4 +148,4 @@ For more detailed information about the backend server, tool integrations, and d
 
 - **Main Project README (`README.md` in the project root):** Provides a high-level overview of the entire project, including architecture and getting started instructions.
 - **Server README (`server/README.md`):**  Details the server-side component, its architecture, configuration, and deployment.
-- **Cloud Functions README (`cloud-functions/README.md`):** Explains the setup and deployment of the Cloud Function tools.
+- **Cloud Functions (optional):** You can add custom tools as Cloud Functions. See repo docs for guidance.

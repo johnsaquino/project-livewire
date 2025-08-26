@@ -65,15 +65,16 @@ Securely store API keys and potentially other sensitive configuration. The backe
     ```
 *   **OpenWeather API Key (for weather tool):**
     ```bash
-    # Replace YOUR_OPENWEATHER_API_KEY with your actual key
-    echo -n "YOUR_OPENWEATHER_API_KEY" | \
-      gcloud secrets create OPENWEATHER_API_KEY --replication-policy="automatic" --data-file=-
+        # Create the Gemini API key secret (if using dev API)
+        echo -n "YOUR_GEMINI_API_KEY" | \
+            gcloud secrets create GOOGLE_API_KEY --replication-policy="automatic" --data-file=-
     ```
 *   **(Optional) Store Cloud Function URLs:** You can also store function URLs as secrets if preferred.
     ```bash
     # Example for Weather Function URL
-    # echo -n "YOUR_WEATHER_FUNCTION_URL" | \
-    #  gcloud secrets create WEATHER_FUNCTION_URL --replication-policy="automatic" --data-file=-
+    # Example: Add secrets for custom tools you create later
+    # echo -n "https://REGION-PROJECT.cloudfunctions.net/my-example-tool" | \
+    #  gcloud secrets create MY_EXAMPLE_TOOL_URL --replication-policy="automatic" --data-file=-
     ```
     *(Note: The current `server/config/config.py` primarily expects URLs from environment variables, but could be adapted to read them from secrets if desired).*
 

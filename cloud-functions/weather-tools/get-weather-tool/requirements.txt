@@ -1,2 +1,1 @@
-requests>=2.31.0
-google-cloud-secret-manager>=2.16.4
+# Placeholder: add your function's dependencies here if you create one.

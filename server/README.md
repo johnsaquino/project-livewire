@@ -8,7 +8,7 @@ The server component is the core backend logic of Project Livewire and is respon
 
 - **WebSocket Communication:** Establishes and manages bidirectional, real-time communication with client applications (frontend UI) using WebSockets.
 - **Gemini API Interaction:**  Connects to and manages sessions with the Gemini Multimodal Live API to process user inputs (text, audio, video) and receive AI-generated responses.
-- **Tool Handling & Function Calling:**  Implements a tool handling mechanism to route function calls initiated by Gemini to appropriate tools (like weather, calendar, etc.). These tools are implemented as separate Google Cloud Functions and are securely invoked via HTTP requests.
+- **Tool Handling & Function Calling:**  Implements a tool handling mechanism to route function calls initiated by Gemini to optional external tools (implemented as separate Google Cloud Functions) and securely invoked via HTTP requests.
 - **Session Management:** Maintains session state for each connected client to ensure conversational context is preserved across multiple interactions.
 - **Configuration Management:**  Handles loading and managing API keys, Cloud Function URLs, and server settings from environment variables and Google Cloud Secret Manager for secure and flexible configuration.
 
@@ -44,12 +44,9 @@ This section guides you through setting up the server component for both local d
        ```
 
 3. **API Keys and Secrets:**
-   - **Google Gemini API Key:**
-     - Obtain an API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
-     - Securely store this key in Google Cloud Secret Manager as `GOOGLE_API_KEY` (recommended for production) or as an environment variable (for local development).
-   - **OpenWeather API Key (optional, for weather tools):**
-     - Sign up for an account at [OpenWeather](https://openweathermap.org/api) and get an API key.
-     - Store it in Secret Manager as `OPENWEATHER_API_KEY` or as an environment variable.
+    - **Google Gemini API Key:**
+       - Obtain an API key from [Google AI Studio](https://makersuite.google.com/app/apikey).
+       - Securely store this key in Google Cloud Secret Manager as `GOOGLE_API_KEY` (recommended for production) or as an environment variable (for local development).
 
 4. **Service Account Setup:**
    - **For Cloud Run Deployment:**
@@ -62,8 +59,7 @@ This section guides you through setting up the server component for both local d
      - Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to the path of this key file. This enables Application Default Credentials (ADC) and allows your local server to authenticate with Google Cloud services like Secret Manager.
 
 5. **Cloud Functions (Tool Implementations):**
-   - Deploy the necessary tool functions as Google Cloud Functions. Refer to the `cloud-functions/README.md` in the project root for detailed instructions on deploying weather and calendar tools.
-   - After deployment, note down the trigger URLs of your deployed Cloud Functions. These URLs will be needed for server configuration.
+   - Optional: add your own Cloud Functions as tools. See `cloud-functions/README.md` for generic guidance. After deployment, note the trigger URLs for configuration.
 
 ### Installation
 
@@ -93,7 +89,7 @@ The server's configuration is managed through a combination of Google Cloud Secr
    - **Purpose:** Securely stores sensitive information like API keys and optionally Cloud Function URLs.
    - **Required Secrets:**
      - `GOOGLE_API_KEY` (Google Gemini API key)
-     - `OPENWEATHER_API_KEY` (OpenWeather API key, if using weather tools)
+   - (Optional) Any tool-specific API keys you add later
    - **Authentication (Cloud Run):** When deployed to Cloud Run with a service account that has the `Secret Manager Secret Accessor` role, the server automatically authenticates and retrieves secrets from Secret Manager.
    - **Authentication (Local Development - Optional):** For local testing with Secret Manager, set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to your service account key file.
 
@@ -106,12 +102,12 @@ The server's configuration is managed through a combination of Google Cloud Secr
      LOG_LEVEL=INFO
 
      # Cloud Function URLs (replace with your actual function URLs)
-     WEATHER_FUNCTION_URL=https://REGION-PROJECT_ID.cloudfunctions.net/get-weather-tool
-     CALENDAR_FUNCTION_URL=https://REGION-PROJECT_ID.cloudfunctions.net/get-calendar-tool
+   # Example future tool URL (commented)
+   # MY_EXAMPLE_TOOL_URL=https://REGION-PROJECT_ID.cloudfunctions.net/my-example-tool
 
      # Optional: API keys as fallbacks for local development (if not using Secret Manager locally)
      GOOGLE_API_KEY=your_gemini_api_key
-     OPENWEATHER_API_KEY=your_openweather_api_key
+   # (Optional) TOOL_SPECIFIC_API_KEY=your_key
 
      # Optional: Explicitly specify service account key for local Secret Manager access
      # GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account-key.json
@@ -275,7 +271,7 @@ To add or modify tools (i.e., functionalities exposed to the Gemini model throug
     - **Client-Side Configuration:** Double-check the WebSocket URL configured in the client application (`client/src/api/gemini-api.js`) to ensure it correctly points to your running server.
 
 - **API Key Errors:**
-    - **Secret Manager Configuration:** If using Secret Manager, verify that the service account running the server (especially in Cloud Run) has the `Secret Manager Secret Accessor` role. Check Secret Manager in Google Cloud Console to confirm that secrets like `GOOGLE_API_KEY` and `OPENWEATHER_API_KEY` are correctly created and their values are set.
+   - **Secret Manager Configuration:** If using Secret Manager, verify that the service account running the server (especially in Cloud Run) has the `Secret Manager Secret Accessor` role. Check Secret Manager in Google Cloud Console to confirm that secrets like `GOOGLE_API_KEY` (and any optional tool secrets) are correctly created and their values are set.
     - **Environment Variables:** If using environment variables for API keys (primarily for local development), ensure they are correctly defined in your `.env` file and that the server is loading them properly.
     - **Server Logs:** Look for error messages in the server logs related to API key retrieval or authentication failures.
 
